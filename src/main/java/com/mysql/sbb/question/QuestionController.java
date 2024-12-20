@@ -3,6 +3,7 @@ package com.mysql.sbb.question;
 
 import com.mysql.sbb.answer.Answer;
 import com.mysql.sbb.answer.AnswerForm;
+import com.mysql.sbb.answer.AnswerService;
 import com.mysql.sbb.user.SiteUser;
 import com.mysql.sbb.user.UserService;
 import jakarta.validation.Valid;
@@ -19,8 +20,10 @@ import com.mysql.sbb.question.QuestionForm;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RequestMapping("/question")
@@ -30,6 +33,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final UserService userService;
+    private final AnswerService answerService;
 
     @GetMapping("/list")
     public String list(Model model,@RequestParam(value="page",defaultValue = "0") int page,
@@ -41,9 +45,12 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
+                         @RequestParam(value = "page",defaultValue = "0") Integer page) {
         Question question = this.questionService.getQuestion(id);
+        Page<Answer> paging  = this.answerService.getList(question,page);
         model.addAttribute("question", question);
+        model.addAttribute("paging",paging );
         return "question_detail";
     }
 

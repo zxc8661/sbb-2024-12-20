@@ -3,9 +3,12 @@ package com.mysql.sbb;
 
 import com.mysql.sbb.answer.Answer;
 import com.mysql.sbb.answer.AnswerRepository;
+import com.mysql.sbb.answer.AnswerService;
 import com.mysql.sbb.question.Question;
 import com.mysql.sbb.question.QuestionRepository;
 import com.mysql.sbb.question.QuestionService;
+import com.mysql.sbb.user.SiteUser;
+import com.mysql.sbb.user.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,15 +28,22 @@ public class SbbApplicationTests{
 
 	@Autowired
 	private AnswerRepository answerRepository;
+	@Autowired
+	private AnswerService answerService;
 
 	@Autowired
 	private QuestionService questionService;
+	@Autowired
+	private UserService userService;
+
 	@Test
 	public void creteTestData(){
+		Question question = this.questionService.getQuestion(312);
+		System.out.println(question.getSubject());
+				SiteUser user= this.userService.getUser("테스트2");
 		for(int i=1;i<301;i++){
-			String subject= String.format("테스트 데이터입니다: [%03d]",i);
-			String content ="내용무";
-			this.questionService.create(subject,content);
+		 	this.answerService.create(question,"테스트"+i,user);
+
 		}
 	}
 

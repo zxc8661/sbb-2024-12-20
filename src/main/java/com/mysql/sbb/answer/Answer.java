@@ -40,4 +40,9 @@ public class Answer {
     @ManyToMany
     Set<SiteUser> voter;
 
+    private Integer voteCount=0;
+
+
+
+
 }
