@@ -1,4 +1,4 @@
-<html layout:decorate="~{layout}">
+<html layout:decorate="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml">
 <div layout:fragment="content" class="container my-3">
     <!-- 질문 -->
     <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
@@ -23,6 +23,10 @@
                     추천
                     <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
                 </a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary toggle-comment-text">
+                    댓글
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.comments)}"></span>
+                </a>
                 <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
                    th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
@@ -31,6 +35,30 @@
                    class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
                    th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
                    th:text="삭제"></a>
+                <div class="comment-text mt-3" style="display: none;">
+                    <div th:if="${question.comments != null and #lists.size(question.comments) > 0}">
+
+                        <h5 class="my-3 border-top">댓글</h5>
+                        <div th:each="comment : ${question.comments}" class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted" th:text="${comment.author.username}"></span>
+                                    <span class="text-muted small" th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                </div>
+                                <p class="mt-2 mb-0" th:text="${comment.content}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <form th:action="@{|/comment/question/${question.id}|}" th:object="${commentForm}" method="post" class="my-3">
+                        <div th:if="${#fields.hasErrors('content')}" class="text-danger">
+                            <p th:errors="*{content}">내용을 입력해주세요.</p>
+                        </div>
+                        <textarea sec:authorize="isAnonymous()" disabled class="form-control" rows="2"></textarea>
+                        <textarea sec:authorize="isAuthenticated()" th:field="*{content}"  class="form-control" rows="2"></textarea>
+                        <input type="submit" value="댓글등록" class="btn btn-primary my-2">
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
@@ -60,6 +88,10 @@
                     추천
                     <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
                 </a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary toggle-comment-text">
+                    댓글
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.comments)}"></span>
+                </a>
                 <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
                    sec:authorize="isAuthenticated()"
                    th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
@@ -68,8 +100,34 @@
                    class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
                    th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
                    th:text="삭제"></a>
+                <div class="comment-text mt-3" style="display: none;">
+                    <hr>
+                    <div th:if="${answer.comments != null and #lists.size(answer.comments) > 0}">
+
+                        <h5 class="my-3 border-top">댓글</h5>
+                        <div th:each="comment : ${answer.comments}" class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted" th:text="${comment.author.username}"></span>
+                                    <span class="text-muted small" th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+                                </div>
+                                <p class="mt-2 mb-0" th:text="${comment.content}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <form th:action="@{|/comment/answer/${answer.id}|}" th:object="${commentForm}" method="post" class="my-3">
+                        <div th:if="${#fields.hasErrors('content')}" class="text-danger">
+                            <p th:errors="*{content}">내용을 입력해주세요.</p>
+                        </div>
+                        <textarea sec:authorize="isAnonymous()" disabled class="form-control" rows="2"></textarea>
+                        <textarea sec:authorize="isAuthenticated()" th:field="*{content}"  class="form-control" rows="2"></textarea>
+                        <input type="submit" value="댓글등록" class="btn btn-primary my-2">
+                    </form>
+                </div>
             </div>
+
         </div>
+
     </div>
     <form id="searchForm" method="get">
         <input type="hidden" id="page" name="page" value="0">
@@ -120,6 +178,7 @@
         });
     });
    const page_elements = document.getElementsByClassName("page-link");
+
 Array.from(page_elements).forEach(function (element) {
     element.addEventListener('click', function () {
         const pageInput = document.getElementById('page');
@@ -133,6 +192,22 @@ Array.from(page_elements).forEach(function (element) {
         }
     });
 });
+     document.addEventListener("DOMContentLoaded", function () {
+        const commentButtons = document.querySelectorAll('.toggle-comment-text');
+
+        commentButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const commentTextDiv = this.closest('.my-3').querySelector('.comment-text');
+
+                // 텍스트 표시/숨기기 토글
+                if (commentTextDiv.style.display === 'none' || commentTextDiv.style.display === '') {
+                    commentTextDiv.style.display = 'block';
+                } else {
+                    commentTextDiv.style.display = 'none';
+                }
+            });
+        });
+    });
 </script>
 
 </html>

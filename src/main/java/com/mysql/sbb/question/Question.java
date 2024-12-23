@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import com.mysql.sbb.Comment.Comment;
 import com.mysql.sbb.answer.Answer;
 
 import com.mysql.sbb.user.SiteUser;
@@ -37,4 +38,7 @@ public class Question {
 
     @ManyToMany
     Set<SiteUser> voter;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
 }

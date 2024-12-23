@@ -1,6 +1,8 @@
 package com.mysql.sbb.question;
 
 
+import com.mysql.sbb.Comment.Comment;
+import com.mysql.sbb.Comment.CommentForm;
 import com.mysql.sbb.answer.Answer;
 import com.mysql.sbb.answer.AnswerForm;
 import com.mysql.sbb.answer.AnswerService;
@@ -45,12 +47,14 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
-                         @RequestParam(value = "page",defaultValue = "0") Integer page) {
+    public String detail(Model model, @PathVariable("id") Integer id,
+                         AnswerForm answerForm, CommentForm commentForm,
+                         @RequestParam(value = "page", defaultValue = "0") Integer page) {
         Question question = this.questionService.getQuestion(id);
-        Page<Answer> paging  = this.answerService.getList(question,page);
+        Page<Answer> paging = this.answerService.getList(question, page);
         model.addAttribute("question", question);
-        model.addAttribute("paging",paging );
+        model.addAttribute("paging", paging);
+        model.addAttribute("commentForm", commentForm); // 폼 객체 추가
         return "question_detail";
     }
 
@@ -123,5 +127,7 @@ public class QuestionController {
         this.questionService.vote(question,user);
         return String.format("redirect:/question/detail/%s",id);
     }
+
+
 
 }

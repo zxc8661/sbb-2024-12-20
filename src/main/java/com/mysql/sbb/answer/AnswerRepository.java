@@ -11,4 +11,5 @@ import java.util.Optional;
 
 public interface AnswerRepository extends JpaRepository<Answer,Integer> {
     Page<Answer> findByQuestion(Question question, Pageable pageable);
+
 }

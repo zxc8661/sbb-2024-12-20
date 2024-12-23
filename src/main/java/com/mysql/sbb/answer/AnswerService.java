@@ -72,4 +72,8 @@ public class AnswerService {
         Pageable pageable = PageRequest.of(page,10,Sort.by(sorts));
         return this.answerRepository.findByQuestion(question,pageable);
     }
+
+//    public Page<Answer> getList(Question question, int page){
+//
+//    }
 }

@@ -1,12 +1,14 @@
 package com.mysql.sbb.answer;
 
 
+import com.mysql.sbb.Comment.CommentForm;
 import com.mysql.sbb.question.Question;
 import com.mysql.sbb.question.QuestionService;
 import com.mysql.sbb.user.SiteUser;
 import com.mysql.sbb.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -32,15 +34,18 @@ public class AnswerController {
     @PostMapping("/create/{id}")
     public String createAnswer(Model model,
                                @PathVariable("id") Integer id,
-                               @RequestParam(value = "content") String content,
+//                               @RequestParam(value = "content") String content,
                                @Valid AnswerForm answerForm,
                                BindingResult bindingResult,
                                Principal principal){
         Question question = this.questionService.getQuestion(id);
         SiteUser siteUser = this.userService.getUser(principal.getName());
         if(bindingResult.hasErrors()){
-            model.addAttribute("question",question);
-            return "question_detail";
+            Page<Answer> paging = this.answerService.getList(question, 0); // 첫 번째 페이지
+            model.addAttribute("question", question);
+            model.addAttribute("paging", paging);
+            model.addAttribute("commentForm", new CommentForm());
+            return String.format("redirect:/question/detail/%s",question.getId());
         }
         Answer answer = this.answerService.create(question,answerForm.getContent(),siteUser);
         return String.format("redirect:/question/detail/%s#answer_%s",id,answer.getId());

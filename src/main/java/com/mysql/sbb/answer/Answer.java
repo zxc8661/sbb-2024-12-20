@@ -1,5 +1,6 @@
 package com.mysql.sbb.answer;
 
+import com.mysql.sbb.Comment.Comment;
 import com.mysql.sbb.question.Question;
 import com.mysql.sbb.user.SiteUser;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -42,7 +44,8 @@ public class Answer {
 
     private Integer voteCount=0;
 
-
+    @OneToMany(mappedBy = "answer",cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
 
 
 }
