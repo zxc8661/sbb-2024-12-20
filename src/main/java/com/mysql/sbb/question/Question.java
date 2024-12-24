@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import com.mysql.sbb.Category.Category;
 import com.mysql.sbb.Comment.Comment;
 import com.mysql.sbb.answer.Answer;
 
@@ -41,4 +42,8 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Comment> comments;
+
+
+    @ManyToOne
+    private Category category;
 }

@@ -1,6 +1,8 @@
 package com.mysql.sbb.question;
 
 
+import com.mysql.sbb.Category.Category;
+import com.mysql.sbb.Category.CategoryService;
 import com.mysql.sbb.Comment.Comment;
 import com.mysql.sbb.Comment.CommentForm;
 import com.mysql.sbb.answer.Answer;
@@ -36,15 +38,30 @@ public class QuestionController {
     private final QuestionService questionService;
     private final UserService userService;
     private final AnswerService answerService;
+    private final CategoryService categoryService;
 
     @GetMapping("/list")
     public String list(Model model,@RequestParam(value="page",defaultValue = "0") int page,
                        @RequestParam(value = "kw",defaultValue = "") String kw) {
-        Page<Question> paging= this.questionService.getList(page,kw);
+        Page<Question> paging= this.questionService.getList(page,kw,"");
         model.addAttribute("paging", paging);
         model.addAttribute("kw",kw);
         return "question_list";
     }
+
+    @GetMapping("/category/{id}")
+    public String list(Model model,
+                       @RequestParam(value="page", defaultValue="0") int page,
+                       @RequestParam(value="kw",defaultValue = "") String kw,
+                       @PathVariable("id") Integer id){
+        Category category = this.categoryService.getCategory(id);
+        Page<Question> paging = this.questionService.getList(page,kw,category.getCategory());
+        model.addAttribute("paging",paging);
+        model.addAttribute("kw",kw);
+        return "question_category";
+
+    }
+
 
     @GetMapping(value = "/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id,
@@ -74,8 +91,9 @@ public class QuestionController {
         if(bindingResult.hasErrors()){
             return "question_form";
         }
+        Category category  = this.categoryService.getCategory(questionForm.getCategoryId());
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.questionService.create(questionForm.getSubject(),questionForm.getContent(),siteUser);
+        this.questionService.create(questionForm.getSubject(),questionForm.getContent(),siteUser,category);
         return "redirect:/question/list";
     }
 

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.mysql.sbb.Category.Category;
 import com.mysql.sbb.answer.Answer;
 import com.mysql.sbb.user.SiteUser;
 import jakarta.persistence.criteria.*;
@@ -27,11 +28,11 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
 
-    public Page<Question> getList(int page,String kw) {
+    public Page<Question> getList(int page,String kw,String category) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page,10, Sort.by(sorts));
-        Specification<Question> spec = search(kw);
+        Specification<Question> spec = search(kw,category);
         return this.questionRepository.findAll(spec,pageable);
     }
 
@@ -44,12 +45,13 @@ public class QuestionService {
         }
     }
 
-    public void create(String subject, String content, SiteUser siteUser){
+    public void create(String subject, String content, SiteUser siteUser,Category category){
         Question question = new Question();
         question.setCreateDate(LocalDateTime.now());
         question.setSubject(subject);
         question.setContent(content);
         question.setAuthor(siteUser);
+        question.setCategory(category);
         this.questionRepository.save(question);
     }
 
@@ -72,7 +74,7 @@ public class QuestionService {
         this.questionRepository.save(question);
    }
 
-    private Specification<Question> search(String kw) {
+    private Specification<Question> search(String kw, String category) {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
             @Override
@@ -81,11 +83,22 @@ public class QuestionService {
                 Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
                 Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
                 Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
-                return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
-                        cb.like(q.get("content"), "%" + kw + "%"),      // 내용
-                        cb.like(u1.get("username"), "%" + kw + "%"),    // 질문 작성자
-                        cb.like(a.get("content"), "%" + kw + "%"),      // 답변 내용
-                        cb.like(u2.get("username"), "%" + kw + "%"));   // 답변 작성자
+                Join<Question, Category> c = q.join("category",JoinType.RIGHT);
+
+                Predicate one=cb.or(
+                        cb.like(q.get("subject"),"%" + kw + "%"),
+                        cb.like(q.get("content"),"%" + kw + "%"),
+                        cb.like(u1.get("username"),"%" + kw + "%"),
+                        cb.like(u2.get("username"),"%" + kw + "%"),
+                        cb.like(a.get("content"), "%" + kw + "%")
+                );
+
+                Predicate two=cb.like(c.get("category"),"%" + category+"%");
+
+                return cb.and(one,two);
+
+
+
             }
         };
     }
