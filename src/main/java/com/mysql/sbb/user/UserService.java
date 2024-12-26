@@ -17,6 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder encoder;
 
     public SiteUser create(String username, String email, String password) {
         SiteUser user = new SiteUser();
@@ -35,5 +36,14 @@ public class UserService {
             throw new DataNotFoundException("siteuser  not found");
         }
 
+    }
+
+    public void modifyPassword(SiteUser user, String password){
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        this.userRepository.save(user);
+    }
+
+    public boolean matches(String newPassword, String currentPassword){
+        return encoder.matches(newPassword,currentPassword);
     }
 }
