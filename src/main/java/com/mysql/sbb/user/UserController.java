@@ -1,17 +1,21 @@
 package com.mysql.sbb.user;
 
 
-import ch.qos.logback.core.model.Model;
+import com.mysql.sbb.Comment.Comment;
+import com.mysql.sbb.Comment.CommentService;
 import com.mysql.sbb.EmailService;
+import com.mysql.sbb.answer.Answer;
+import com.mysql.sbb.answer.AnswerService;
+import com.mysql.sbb.question.Question;
+import com.mysql.sbb.question.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.UUID;
@@ -23,6 +27,9 @@ public class UserController {
 
     private final UserService userService;
     private final EmailService emailService;
+    private final QuestionService questionService;
+    private final AnswerService answerService;
+    private final CommentService commentService;
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -104,6 +111,37 @@ public class UserController {
             return "redirect:/question/list";
         }
         return "redirect:/question/list";
+    }
+
+
+    @GetMapping("/detail")
+    public String userDetail(Model model, Principal principal){
+        SiteUser user = this.userService.getUser(principal.getName());
+        model.addAttribute("user",user);
+        return "user_detail";
+    }
+
+
+    @GetMapping("/detail/{type}")
+    public String userDetailContent(Model model,
+                                    Principal principal,
+                                    @PathVariable("type") String type){
+        SiteUser user = this.userService.getUser(principal.getName());
+
+        if(type.equals("question")){
+            Page<Question> page =  this.questionService.getList(0,user.getUsername());
+            model.addAttribute("page",page);
+
+        }else if(type.equals("comment")){
+            Page<Comment> page = this.commentService.getComments(user,0);
+            model.addAttribute("page",page);
+
+        }else if(type.equals("answer")){
+            Page<Answer> page = this.answerService.getList(user,0);
+            model.addAttribute("page",page);
+        }
+        model.addAttribute("type",type);
+        return "user_detail_content";
     }
 
 }

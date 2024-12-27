@@ -26,6 +26,9 @@
                 <li class="nav-item">
                     <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/modify/password}">비밀번호 변경</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/detail}">프로필</a>
+                </li>
             </ul>
         </div>
     </div>

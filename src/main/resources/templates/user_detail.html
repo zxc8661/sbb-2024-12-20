@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 화면</title>
+    <!-- Bootstrap CSS -->
+</head>
+<body>
+<div layout:fragment="content" class ="container my-3">
+    <div class="container my-5 d-flex justify-content-center">
+        <!-- 프로필 카드 -->
+        <div class="card shadow" style="width: 100%; max-width: 600px;">
+            <div class="card-header text-center bg-primary text-white">
+                <h2>프로필 정보</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th>아이디</th>
+                        <td th:text="${user.username}"></td>
+                    </tr>
+                    <tr>
+                        <th>이메일</th>
+                        <td th:text="${user.email}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-center gap-3">
+                    <a th:href="@{/user/detail/question}" class="btn btn-primary">작성한 질문</a>
+                    <a th:href="@{/user/detail/answer}" class="btn btn-secondary">작성한 답변</a>
+                    <a th:href="@{/user/detail/comment}" class="btn btn-success">작성한 댓글</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
