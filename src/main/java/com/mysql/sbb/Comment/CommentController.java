@@ -78,4 +78,11 @@ public class CommentController {
         this.commentService.create(commentForm.getContent(),user,answer,null);
         return String.format("redirect:/question/detail/%s",answer.getQuestion().getId());
     }
+
+    @GetMapping("/list")
+    public String getComments(Model model,@RequestParam(value="page",defaultValue = "0") int page){
+        Page<Comment> Paging = this.commentService.getComments(page);
+        model.addAttribute("paging",Paging);
+        return "recent_commentOrAnswer";
+    }
 }

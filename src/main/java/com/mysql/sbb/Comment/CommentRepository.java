@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     Page<Comment> findByAuthor (SiteUser user,Pageable pageable);
+    Page<Comment> findAll (Pageable pageable);
 }

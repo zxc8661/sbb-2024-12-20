@@ -105,4 +105,12 @@ public class AnswerController {
     }
 
 
+    @GetMapping("/list")
+    public String answerList(Model model, @RequestParam(value="page",defaultValue = "0") int page){
+        Page<Answer> paging = this.answerService.getList(page);
+        model.addAttribute("paging",paging);
+        return "recent_commentOrAnswer";
+    }
+
+
 }

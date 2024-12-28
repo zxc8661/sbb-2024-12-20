@@ -68,6 +68,7 @@ public class QuestionController {
                          AnswerForm answerForm, CommentForm commentForm,
                          @RequestParam(value = "page", defaultValue = "0") Integer page) {
         Question question = this.questionService.getQuestion(id);
+        question.setViewCount(question.getViewCount()+1);
         Page<Answer> paging = this.answerService.getList(question, page);
         model.addAttribute("question", question);
         model.addAttribute("paging", paging);
@@ -145,6 +146,7 @@ public class QuestionController {
         this.questionService.vote(question,user);
         return String.format("redirect:/question/detail/%s",id);
     }
+
 
 
 

@@ -57,4 +57,11 @@ public class CommentService {
         Pageable pageable = PageRequest.of(page,10,Sort.by(sorts));
         return this.commentRepository.findByAuthor(user,pageable);
     }
+
+    public Page<Comment> getComments(int page){
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable=PageRequest.of(page,10,Sort.by(sorts));
+        return this.commentRepository.findAll(pageable);
+    }
 }
