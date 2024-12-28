@@ -73,6 +73,7 @@ public class QuestionController {
         model.addAttribute("question", question);
         model.addAttribute("paging", paging);
         model.addAttribute("commentForm", commentForm); // 폼 객체 추가
+        this.questionService.modify(question,question.getSubject(),question.getContent());
         return "question_detail";
     }
 
