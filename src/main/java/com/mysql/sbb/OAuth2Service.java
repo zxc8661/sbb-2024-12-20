@@ -63,6 +63,7 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
         customAttribute.put("name", userProfile.getUsername());
         customAttribute.put("email", userProfile.getEmail());
 
+
         return customAttribute;
     }
 

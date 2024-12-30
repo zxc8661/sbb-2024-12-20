@@ -10,7 +10,7 @@
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea th:field="*{content}" class="form-control" rows="10"></textarea>
+            <textarea th:field="*{content}" class="form-control" rows="10" id="editor"></textarea>
         </div>
         <div class="mb-3">
             <label for="categoryId" class="form-label" >카테고리</label>
@@ -23,5 +23,13 @@
         <input type="submit" value="저장하기" class="btn btn-primary my-2">
     </form>
 </div>
-
+<script>
+    // SimpleMDE를 textarea에 초기화
+    var simplemde = new SimpleMDE({
+        element: document.getElementById("editor"),
+        placeholder: "여기에 내용을 입력하세요...",
+        spellChecker: false,
+        status: false
+    });
+</script>
 </html>

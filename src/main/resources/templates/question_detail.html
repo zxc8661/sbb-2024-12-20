@@ -156,7 +156,7 @@
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control"
                   rows="10"></textarea>
-        <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
+        <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10" id="editor"></textarea>
         <input type="submit" value="답변등록" class="btn btn-primary my-2">
     </form>
 </div>
@@ -207,6 +207,12 @@ Array.from(page_elements).forEach(function (element) {
                 }
             });
         });
+    });
+      var simplemde = new SimpleMDE({
+        element: document.getElementById("editor"),
+        placeholder: "여기에 내용을 입력하세요...",
+        spellChecker: false,
+        status: false
     });
 </script>
 
