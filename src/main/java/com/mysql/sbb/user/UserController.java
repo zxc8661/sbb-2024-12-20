@@ -12,12 +12,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -143,5 +147,12 @@ public class UserController {
         model.addAttribute("type",type);
         return "user_detail_content";
     }
+    @GetMapping("/loginInfo")
+    public String getJson(Authentication authentication) {
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        return attributes.toString();
+    }
 }

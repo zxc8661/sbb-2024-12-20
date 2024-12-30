@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
 @Entity
+@DynamicUpdate
 public class SiteUser {
 
     @Id
@@ -21,4 +23,7 @@ public class SiteUser {
 
     @Column(unique = true)
     private String email;
+
+    private String provider;
+
 }
