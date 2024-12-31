@@ -25,31 +25,38 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2UserService oAuth2UserService = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
+        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // 로그인을 수행한 서비스의 이름
-
-        String userNameAttributeName = userRequest
-                .getClientRegistration()
+        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // 제공자 이름
+        String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
-                .getUserNameAttributeName(); // PK가 되는 정보
+                .getUserNameAttributeName(); // 고유 식별자 이름
 
-        Map<String, Object> attributes = oAuth2User.getAttributes(); // 사용자가 가지고 있는 정보
+        Map<String, Object> attributes = oAuth2User.getAttributes(); // 사용자 정보
 
+        // 사용자 정보 매핑
         UserProfile userProfile = OAuthAttributes.extract(registrationId, attributes);
-        userProfile.setProvider(registrationId);
+        userProfile.setProvider(registrationId); // 제공자 이름 설정
 
-        updateOrSaveUser(userProfile);
+        // 사용자 저장 또는 업데이트
+        SiteUser savedUser = updateOrSaveUser(userProfile);
 
-        Map<String, Object> customAttribute =
-                getCustomAttribute(registrationId, userNameAttributeName, attributes, userProfile);
+        // 사용자 속성 커스터마이징
+        Map<String, Object> customAttribute = getCustomAttribute(
+                registrationId,
+                userNameAttributeName,
+                attributes,
+                userProfile
+        );
 
+        // OAuth2User 반환
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("USER")),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 customAttribute,
-                userNameAttributeName);
+                userNameAttributeName
+        );
     }
 
     public Map getCustomAttribute(String registrationId,

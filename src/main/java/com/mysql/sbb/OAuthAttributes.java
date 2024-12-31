@@ -33,9 +33,9 @@ public enum OAuthAttributes {
     public static UserProfile extract(String registrationId, Map<String, Object> attributes) {
         // registrationId에 해당하는 로그인 서비스의 사용자 정보를 추출
         return Arrays.stream(values())
-                .filter(value -> registrationId.equals(value.registrationId))
+                .filter(attr -> attr.registrationId.equals(registrationId))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new)
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 OAuth 제공자입니다."))
                 .of.apply(attributes);
     }
 }

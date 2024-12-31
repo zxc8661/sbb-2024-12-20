@@ -15,7 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -89,12 +93,20 @@ public class QuestionController {
                                  BindingResult bindingResult,
                                  Principal principal)
     {
-
         if(bindingResult.hasErrors()){
             return "question_form";
         }
         Category category  = this.categoryService.getCategory(questionForm.getCategoryId());
-        SiteUser siteUser = this.userService.getUser(principal.getName());
+        SiteUser siteUser;
+        if(principal instanceof UsernamePasswordAuthenticationToken) {
+            siteUser = this.userService.getUser(principal.getName());
+//        }else if(principal instanceof OAuth2AuthorizationCodeAuthenticationToken){
+        }else{
+            OAuth2User oAuth2User = ((OAuth2AuthenticationToken)principal).getPrincipal();
+            String email = oAuth2User.getAttribute("name");
+            siteUser = this.userService.getUser(email);
+        }
+
         this.questionService.create(questionForm.getSubject(),questionForm.getContent(),siteUser,category);
         return "redirect:/question/list";
     }
